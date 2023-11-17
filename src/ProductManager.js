@@ -1,19 +1,21 @@
+import fs from 'fs'
 class ProductManager {
     constructor(path) {
     this.path = path;
+    try {
+        let products = fs.readFileSync(this.path, "utf-8");
+        this.products = JSON.parse(products);
+      } catch (error) {
+        console.error("Error al leer el archivo JSON:", error);
+        this.products = [];
+      }
     }
 
-    getProducts() {
-    const fs = require("fs");
-    if (!fs.existsSync(this.path)) {
-        return [];
-    }
-    const products = fs.readFileSync(this.path, "utf-8");
-    return JSON.parse(products);
+    getProducts(){
+        return this.products
     }
 
     addProduct(title, description, price, thumbnail, code, stock) {
-    const fs = require("fs");
     const products = this.getProducts();
     const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
     const product = {
@@ -25,7 +27,7 @@ class ProductManager {
         code,
         stock,
     };
-    const productCodeRepetido = products.some((product) => product.code === code);
+    const productCodeRepetido = this.products.some((product) => product.code === code);
     if (productCodeRepetido) {
         console.log(`EL CAMPO DE  ${code} SE REPITE `);
         return;
@@ -47,7 +49,6 @@ class ProductManager {
     return product;
     }
     updateProduct(id, field, value) {
-    const fs = require("fs");
     const products = this.getProducts();
     const index = products.findIndex((product) => product.id === id);
     if (index !== -1) {
@@ -59,7 +60,6 @@ class ProductManager {
     }
     }
     deleteProduct(id) {
-    const fs = require("fs");
     const products = this.getProducts();
     const index = products.findIndex((product) => product.id === id);
     if (index !== -1) {
@@ -72,14 +72,16 @@ class ProductManager {
     }
 }
 
-const productManager = new ProductManager("./Productos.json");
-const products = productManager.getProducts();
-    console.log(products);
-productManager.addProduct("producto prueba1", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
-console.log(products);
-const productByID = productManager.getProductById(1)
-const productByID1 = productManager.getProductById(7)
-const actualizarProducto = productManager.updateProduct(1, "price", 300)
-console.log(products)
-productManager.deleteProduct(1);
-console.log(products);    
+// const productManager = new ProductManager("./Productos.json");
+// const products = productManager.getProducts();
+//     console.log(products);
+// productManager.addProduct("producto prueba1", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
+// console.log(products);
+// const productByID = productManager.getProductById(1)
+// const productByID1 = productManager.getProductById(7)
+// const actualizarProducto = productManager.updateProduct(1, "price", 300)
+// console.log(products)
+// productManager.deleteProduct(1);
+// console.log(products);  
+
+export { ProductManager };
