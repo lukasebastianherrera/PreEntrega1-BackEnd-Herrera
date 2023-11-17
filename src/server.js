@@ -28,6 +28,9 @@ app.get("/products", (req, res) => {
     res.json(products)
   }
   });
+// Rutas para las pruebas :
+// http://localhost:8080/products
+// http://localhost:8080/products?limit=5
 
   app.get("/products/:pid", (req, res) => {
     const pid = Number(req.params.pid);
@@ -38,6 +41,7 @@ app.get("/products", (req, res) => {
         res.send(`el producto con el id ${pid} no existe`);
     }
 });
-
+// http://localhost:8080/products/2
+// http://localhost:8080/products/34123123
 
 app.listen(8080, () =>  console.log(`servidor escuchando en 8080`))
