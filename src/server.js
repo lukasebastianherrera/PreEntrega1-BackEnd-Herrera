@@ -4,100 +4,40 @@ import {ProductManager} from "./ProductManager.js";
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 
-const productos = [
-	{
-		"title": "televisor 101'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 102'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 103'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 104'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 105'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 106'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 107'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 108'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 109'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	},
-	{
-		"title": "televisor 110'",
-		"description": "producto caro",
-		"price": "99999",
-		"thumbnail": "ejemplo.jpg",
-		"code": "codigo123",
-		"stock": "999"
-	}
-]
+const productManager = new ProductManager("./Productos.json");
+const products = productManager.getProducts();
+productManager.addProduct("producto prueba1", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
+productManager.addProduct("producto prueba2", "Este es un producto prueba", 200, "Sin imagen", "abc223", 25);
+productManager.addProduct("producto prueba3", "Este es un producto prueba", 200, "Sin imagen", "abc323", 25);
+productManager.addProduct("producto prueba4", "Este es un producto prueba", 200, "Sin imagen", "abc423", 25);
+productManager.addProduct("producto prueba5", "Este es un producto prueba", 200, "Sin imagen", "abc523", 25);
+productManager.addProduct("producto prueba6", "Este es un producto prueba", 200, "Sin imagen", "abc623", 25);
+productManager.addProduct("producto prueba7", "Este es un producto prueba", 200, "Sin imagen", "abc723", 25);
+productManager.addProduct("producto prueba8", "Este es un producto prueba", 200, "Sin imagen", "abc823", 25);
+productManager.addProduct("producto prueba9", "Este es un producto prueba", 200, "Sin imagen", "abc923", 25);
+productManager.addProduct("producto prueba10", "Este es un producto prueba", 200, "Sin imagen", "abc1023", 25);
 
-
-app.get("/", (request, response) => {
-    response.send("<h1>Bienvenido Tutor 👌 </h1>")
+app.get("/", (req, res) => {
+    res.send("<h1>Bienvenido Tutor 👌 </h1>")
 } )
 app.get("/products", (req, res) => {
   const limit = req.query.limit;
   if(limit){
-    res.json(productos.slice(0, limit));
+    res.json(products.slice(0, limit));
   } else{
-    res.json(productos)
+    res.json(products)
   }
   });
+
+  app.get("/products/:pid", (req, res) => {
+    const pid = Number(req.params.pid);
+    const product = productManager.getProductById(pid);
+    if (product) {
+        res.json(product);
+    } else {
+        res.send(`el producto con el id ${pid} no existe`);
+    }
+});
+
 
 app.listen(8080, () =>  console.log(`servidor escuchando en 8080`))
