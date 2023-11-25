@@ -14,7 +14,7 @@ class ProductManager {
     getProducts(){
         return this.products
     }
-
+    
     addProduct(title, description, price, thumbnail, code, stock) {
     const products = this.getProducts();
     const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
@@ -72,6 +72,18 @@ class ProductManager {
     }
 }
 
+class Product {
+    constructor(id, title, description, price, thumbnail, code, stock,){
+        this.id = userId; 
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.thumbnail = thumbnail;
+        this.code = code;
+        this.stock = stock;
+    }
+}
+
 // const productManager = new ProductManager("./Productos.json");
 // const products = productManager.getProducts();
 //     console.log(products);
@@ -84,4 +96,4 @@ class ProductManager {
 // productManager.deleteProduct(1);
 // console.log(products);  
 
-export { ProductManager };
+export { ProductManager, Product };

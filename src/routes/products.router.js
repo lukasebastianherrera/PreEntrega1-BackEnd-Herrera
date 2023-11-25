@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {ProductManager} from "../ProductManager.js";
+import {ProductManager, Product} from "../ProductManager.js";
 
 const router = Router();
 
@@ -28,9 +28,42 @@ router.get("/:pid", (req, res) => {
 
 router.post("/", (req, res) =>{
     const { title, description, code, price, stock, category, thumbnails } = req.body;
+    if (!title || !description || !code || !price || !stock || !category) {
+        return res.json({ 
+            error: "Todos los campos son obligatorios" 
+        });
+    }
+
+    const productCodeRepetido = products.some((product) => product.code === code);
+    if (productCodeRepetido) {
+        console.log(`EL CAMPO DE  ${code} SE REPITE `);
+        return res.status(500).json({
+            error: "hubo un error, code repetido"
+    });
+    }
+
+    const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+
+    products.push({
+        id: Number(id),
+        title,
+        description,
+        code, 
+        price, 
+        stock, 
+        category, 
+        thumbnails,
+    })
+
+    res.json({
+        status: "creado",
+    })
+
+
+
 })
 router.put("/:pid", (req, res) => {
-    
+
 });
 router.delete("/:pid", (req, res) => {
 

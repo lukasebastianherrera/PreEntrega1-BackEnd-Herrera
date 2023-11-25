@@ -1,13 +1,11 @@
 import express from "express"
-import {ProductManager} from "./ProductManager.js";
 import cartsRouter from  "./routes/carts.router.js"
 import productsRouter from "./routes/products.router.js"
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-const productManager = new ProductManager("./Productos.json");
-const products = productManager.getProducts();
 // productManager.addProduct("producto prueba1", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
 
 
