@@ -5,10 +5,10 @@ class ProductManager {
     try {
         let products = fs.readFileSync(this.path, "utf-8");
         this.products = JSON.parse(products);
-      } catch (error) {
+    } catch (error) {
         console.error("Error al leer el archivo JSON:", error);
         this.products = [];
-      }
+    }
     }
 
     getProducts(){
@@ -16,17 +16,17 @@ class ProductManager {
     }
     
     addProduct(title, description, price, thumbnail, code, stock) {
-    const products = this.getProducts();
-    const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
-    const product = {
-        id,
-        title,
-        description,
-        price,
-        thumbnail,
-        code,
-        stock,
-    };
+        const products = this.getProducts();
+        const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+        const product = {
+            id,
+            title,
+            description,
+            price,
+            thumbnail,
+            code,
+            stock,
+        };
     const productCodeRepetido = this.products.some((product) => product.code === code);
     if (productCodeRepetido) {
         console.log(`EL CAMPO DE  ${code} SE REPITE `);
@@ -37,9 +37,12 @@ class ProductManager {
         return;
     }
     products.push(product);
+
     fs.writeFileSync(this.path, JSON.stringify(products, null, "\t"));
+
     console.log(`Producto con id: ${id} se añadio`);
     }
+    
     getProductById(id) {
     const products = this.getProducts();
     const product = products.find((product) => product.id === id);

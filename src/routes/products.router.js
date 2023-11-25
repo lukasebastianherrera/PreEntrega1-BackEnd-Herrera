@@ -25,6 +25,7 @@ router.get("/:pid", (req, res) => {
         res.send(`el producto con el id ${pid} no existe`);
     }
 });
+// http://localhost:8080/api/products/
 
 router.post("/", (req, res) =>{
     const { title, description, code, price, stock, category, thumbnails } = req.body;
@@ -59,14 +60,74 @@ router.post("/", (req, res) =>{
         status: "creado",
     })
 
-
-
+    // ejemplo para enviar desde body  
+    // {
+    //     "title": "Nuevo Producto1",
+    //     "description": "Descripción del nuevo producto",
+    //     "code": "ABC123",
+    //     "price": 100,
+    //     "stock": 100,
+    //     "category": "Electrónicos",
+    //     "thumbnails": [
+    //       "ruta_imagen_1.jpg"
+    //     ]
+    //   }
 })
-router.put("/:pid", (req, res) => {
+
+
+router.put("/:id", (req, res) => {
+    const { id } = req.params; 
+    const {title, description, code, price, stock, category, thumbnails } = req.body;
+
+    const index = products.findIndex((user) => user.id === Number(id));
+    if(index === -1){
+        return res.json({
+            error: "Producto no encontrado"
+        })
+    }
+
+    products[index] = {
+        id: Number(id), 
+        title,
+        description,
+        code, 
+        price, 
+        stock, 
+        category, 
+        thumbnails,
+    }
+    
+    res.json({
+        status: "actualizado",
+        producto: {
+            id: Number(id), 
+            title,
+            description,
+            code, 
+            price, 
+            stock, 
+            category, 
+            thumbnails,
+        }
+    })
+// http://localhost:8080/api/products/1
 
 });
-router.delete("/:pid", (req, res) => {
-
-});
+router.delete("/:id", (req, res) => {
+    const { id } = req.params;
+    const index = products.findIndex((product) => product.id === Number(id));
+    if (index === -1) {
+        return res.json({
+        error: "Producto no encontrado ",
+        });
+    }
+    
+    products.splice(index, 1);
+    
+    res.json({
+        status: "Producto Eliminado",
+    });
+    });;
+// http://localhost:8080/api/products/1
 
 export default router;
