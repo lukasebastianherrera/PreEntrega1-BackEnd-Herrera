@@ -1,10 +1,12 @@
 import { Router } from "express";
-import {ProductManager, Product} from "../ProductManager.js";
+import {ProductManager, Product } from "../ProductManager.js";
+import { validarProducto } from "../utils/validarProducto.js";
 
 const router = Router();
 
 const productManager = new ProductManager("./Productos.json");
 const products = productManager.getProducts();
+productManager.saveProduct()
 
 
 router.get("/", (req, res) => {
@@ -27,39 +29,23 @@ router.get("/:pid", (req, res) => {
 });
 // http://localhost:8080/api/products/
 
-router.post("/", (req, res) =>{
-    const { title, description, code, price, stock, category, thumbnails } = req.body;
-    if (!title || !description || !code || !price || !stock || !category) {
-        return res.json({ 
-            error: "Todos los campos son obligatorios" 
+router.post("/", validarProducto, async (req, res) =>{
+    const { title, description, code, price, stock, category, thumbnail } = req.body;
+    const product = new Product(null, title, description, price, thumbnail, code, stock, category);
+    try{
+        await productManager.saveProduct(product);
+        res.json({
+            status: "creado",
+            product
+        })
+    } catch (error) {
+        console.error("Error al crear el producto:", error);
+        res.status(500).json({
+            error: "Hubo un error al crear el producto",
+            details: error.message  // Esto proporcionará detalles adicionales sobre el error
         });
     }
-
-    const productCodeRepetido = products.some((product) => product.code === code);
-    if (productCodeRepetido) {
-        console.log(`EL CAMPO DE  ${code} SE REPITE `);
-        return res.status(500).json({
-            error: "hubo un error, code repetido"
-    });
-    }
-
-    const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
-
-    products.push({
-        id: Number(id),
-        title,
-        description,
-        code, 
-        price, 
-        stock, 
-        category, 
-        thumbnails,
-    })
-
-    res.json({
-        status: "creado",
-    })
-
+})
     // ejemplo para enviar desde body  
     // {
     //     "title": "Nuevo Producto1",
@@ -72,62 +58,40 @@ router.post("/", (req, res) =>{
     //       "ruta_imagen_1.jpg"
     //     ]
     //   }
-})
 
 
-router.put("/:id", (req, res) => {
-    const { id } = req.params; 
-    const {title, description, code, price, stock, category, thumbnails } = req.body;
-
-    const index = products.findIndex((user) => user.id === Number(id));
-    if(index === -1){
-        return res.json({
-            error: "Producto no encontrado"
-        })
-    }
-
-    products[index] = {
-        id: Number(id), 
-        title,
-        description,
-        code, 
-        price, 
-        stock, 
-        category, 
-        thumbnails,
-    }
+router.put("/:pid", (req, res) => {
+    const { pid } = req.params;
+    const camposActualizados = req.body;
+    
+    productManager.updateProduct(Number(pid), camposActualizados);
     
     res.json({
         status: "actualizado",
         producto: {
-            id: Number(id), 
-            title,
-            description,
-            code, 
-            price, 
-            stock, 
-            category, 
-            thumbnails,
-        }
-    })
-// http://localhost:8080/api/products/1
-
+            id: Number(pid),
+            ...camposActualizados,
+            }
+        });
 });
-router.delete("/:id", (req, res) => {
-    const { id } = req.params;
-    const index = products.findIndex((product) => product.id === Number(id));
-    if (index === -1) {
+router.delete("/:pid", async (req, res) => {
+    const { pid } = req.params;
+    if (!pid) {
         return res.json({
-        error: "Producto no encontrado ",
+            status: "El id es requerido",
         });
     }
-    
-    products.splice(index, 1);
-    
-    res.json({
-        status: "Producto Eliminado",
-    });
-    });;
+    try {
+        await productManager.deleteProduct(Number(pid));
+        res.json({
+            message: "Producto eliminado"
+        })
+    } catch (e) {
+        res.json({
+            error: e,
+        })
+    }
+});;
 // http://localhost:8080/api/products/1
 
 export default router;
