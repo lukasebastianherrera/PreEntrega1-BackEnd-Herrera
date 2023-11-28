@@ -44,7 +44,7 @@ class ProductManager {
         console.log(`Hubo un error al guardar el producto: ${error}`);
         throw Error("Hubo un error al crear el producto: " + error);
         }
-    
+        
     } 
     getProductById(id) {
         const products = this.getProducts();
@@ -101,7 +101,7 @@ class ProductManager {
 }
 
 class Product {
-    constructor(id, title, description,  price, thumbnail, code, stock, category){
+    constructor(title, description,  price, thumbnail, code, stock, category){
         this.title = title;
         this.description = description;
         this.code = code;

@@ -1,32 +1,57 @@
 import { Router } from "express";
+import { CartManager, Cart } from "../CartManager.js";
 
 const router = Router();
 
-const carts = []
+const cartManager = new CartManager("./Carritos.json")
 
-router.post("/", (req, res) => {
-    const id = carts.length > 0 ? carts[carts.length - 1].id + 1 : 1;
-    carts.push({
-        id: Number(id),
-        products: [],
-    })  
-    res.json({
-        status: "Carrito creado",
-        carts,
-    })
+
+
+router.post("/", async (req, res) => {
+    const carts = cartManager.getCarts();
+    const {quantity , products } =  req.body;
+    const cart = new Cart(products, quantity)
+    try{
+        await cartManager.saveCarts(cart); 
+        res.json({
+            status: "creado",
+            cart,
+        })
+    }  catch(e) {
+        console.error("error al crear el carrito", e)
+        res.status(500).json({
+            error: "Hubo un error al crear el carrito",
+            details: error.message
+        });
+
+    }
+    cartManager.saveCarts(); 
+    // ejemplo para enviar desde postman
+    // {
+    //     "products": []
+    // }
 })
 
-router.get("/:id", (req, res) =>{
-    const { id } = req.params;
+router.get("/:cid", async (req, res) =>{
+    const cid = Number(req.params.cid);
 
-    const cart = carts.find((cart) => cart.id === Number(id));
-
-    if (!cart) {
-        return res.json({
-            error: `Error el carrito con id: ${id} no existe`
+    try {
+        const cart = await cartManager.getCartById(cid);
+        if (cart) {
+            res.json({
+                ID: cart.id,
+                products: cart.products,
+            });
+        } else {
+            res.json({
+                error: `El carrito con el id ${cid} no fue encontrado`,
+            });
+        }
+    } catch (error) {
+        console.error("Error al obtener el carrito", error);
+        res.json({
+            error: "Hubo un error al obtener el carrito",
         });
-    } else {
-        res.send(cart)
     }
 });
 // http://localhost:8080/api/carts/ (enviar {} desde body)

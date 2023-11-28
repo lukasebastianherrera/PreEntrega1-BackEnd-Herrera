@@ -42,7 +42,7 @@ router.post("/", validarProducto, async (req, res) =>{
         console.error("Error al crear el producto:", error);
         res.status(500).json({
             error: "Hubo un error al crear el producto",
-            details: error.message  // Esto proporcionará detalles adicionales sobre el error
+            details: error.message
         });
     }
 })
