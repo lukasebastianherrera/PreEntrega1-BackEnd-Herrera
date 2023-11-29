@@ -56,30 +56,38 @@ router.get("/:cid", async (req, res) =>{
 });
 // http://localhost:8080/api/carts/ (enviar {} desde body)
 
-router.post("/:cid/product/:pid", (req, res) => {
-    const cartId = req.params.cid;
-    const productId = req.params.pid;
-    const quantity = req.body.quantity || 1;
-    const cart = carts.find(cart => cart.id === cartId);
-    if(!cart){
-        return res.json({
-            error: "carrito no encontrado"
-        })
-    }
-    const productoExistente = cart.products.find(product => product.id === productId);
+router.post("/:cid/product/:pid", async (req, res) => {
+    try {
+        const carts = await cartManager.getCarts();
+        const { cid, pid } = req.params;
+        const index = carts.findIndex((cart) => cart.id === Number(cid));
 
-    if(productoExistente){
-        existingProduct.quantity += quantity;
-    } else {
-        cart.products.push({
-            id: productId,
-            quantity: quantity
-        })  
+        if (index == -1) {
+        return res.json("Carrito no encontrado");
+        }
+        const cartExist = carts[index];
+        const productIndex = cartExist.products.findIndex((prod) => prod.product === Number(pid)
+        );
+        if (productIndex == -1) {
+            cartExist.products.push({
+            product: Number(pid),
+            quantity: 1,
+        });
+        } else {
+        cartExist.products[productIndex].quantity++;
+        }
+        carts[index] = cartExist;
+        await cartManager.saveCarts(carts)
+        res.json(cartExist)
+    } catch {
+        console.error("Error al agregar el producto al carrito", error); 
+        res.send("Error al agregar producto", error);
     }
-    res.json({
-        status: "Producto agregado al carrito",
-        cartId: cartId
-    });
+    // para enviar desde body
+    // {
+    //     "product": 1,
+    //     "quantity": 1
+    // }
 })
 
 
